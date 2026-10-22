@@ -5,7 +5,7 @@
 **勾出你的忌口，直接看菜单里哪些你能吃、哪些必须问柜台。** 不用登录，不上传任何信息。
 
 <p>
-<a href="https://malisdll.github.io/mcd-picky-officer/?p=peanut">
+<a href="https://mcd-picky-officer.app.workbuddy.host/?sharecode=WBQMQKGAPS&p=peanut">
 <img alt="在线试用" src="https://img.shields.io/badge/%F0%9F%91%89%20%E5%9C%A8%E7%BA%BF%E8%AF%95%E7%94%A8-%E4%B8%8D%E7%94%A8%20Token-8a4b12?style=for-the-badge">
 </a>
 <img alt="tests" src="https://img.shields.io/badge/tests-206%20passed-1e7a4f?style=flat-square">

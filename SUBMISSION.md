@@ -47,6 +47,10 @@ git push -u origin main
 
 ## 2. 开启 GitHub Pages（让演示页有个可点的网址）
 
+> **已经有在线链接了，不必等这一步。**
+> 演示页已发布在：<https://mcd-picky-officer.app.workbuddy.host/?sharecode=WBQMQKGAPS&p=peanut>
+> 下面这一节只在你想额外挂一个 GitHub Pages 入口时才需要做。
+
 推上去之后：
 
 1. 仓库 → **Settings → Pages**
