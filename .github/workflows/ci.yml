@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: test (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # 本项目零第三方依赖，因此这一步不需要 pip install
+      - name: 依赖检查（应为空）
+        run: |
+          if [ -f requirements.txt ]; then
+            echo "声明了依赖，请确认是否必要"; cat requirements.txt
+          else
+            echo "无第三方依赖"
+          fi
+
+      - name: 单元测试（离线，不需要 Token）
+        run: python -m unittest discover -s tests -t . -v
+
+      - name: 端到端冒烟（示例数据）
+        run: |
+          python run.py ask "我花生过敏，不吃辣，人均25" --html /tmp/card.html --json /tmp/out.json
+          test -s /tmp/card.html
+          test -s /tmp/out.json
+          echo "冒烟通过"
+
+      - name: 敏感信息扫描
+        if: always()
+        run: |
+          set +e
+          hits=$(grep -rInE "(Bearer [A-Za-z0-9._-]{20,}|sk-[A-Za-z0-9]{20,}|1[3-9][0-9]{9})" \
+            --include="*.py" --include="*.json" --include="*.md" --include="*.html" \
+            --exclude-dir=.git . )
+          if [ -n "$hits" ]; then
+            echo "::error::发现疑似密钥或手机号，构建失败"
+            echo "$hits"
+            exit 1
+          fi
+          echo "未发现敏感信息"
