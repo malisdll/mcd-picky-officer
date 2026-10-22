@@ -1,0 +1,426 @@
+{
+  "_meta": {
+    "warning": "示例数据，仅用于离线演示与单元测试。真实运行时必须由麦当劳 MCP 实时返回的菜单/餐品/算价接口填充，价格与营养值请勿用于任何实际决策。",
+    "what_is_this": "本文件的 allergens 字段是人工填的，用来演示「官方提供配料」时引擎能给出的完整效果。真实 MCP 不返回任何配料字段（见 MCP_INTEGRATION.md 第 2 节），所以 --online 的结论会明显更保守：多数餐品只能是「信息不足」。这两者不矛盾，是同一个引擎在两种数据条件下的真实表现。想看真实效果请加 --online。",
+    "source": "人工构造，结构对齐 MCP 菜单/餐品/算价返回字段",
+    "currency": "CNY，所有价格单位为分（integer）",
+    "store": "示例门店（模拟）",
+    "sodium_note": "带 sodium/protein 的条目取官方营养表实测值（2026-10-22）；没有的表示官方表里按名称查不到该餐品——包括「薯条（中）」「麦乐鸡（5块）」这类带规格后缀的名字，因为官方表里是「薯条」「麦乐鸡」，我们不做模糊匹配，宁可留空。"
+  },
+  "items": [
+    {
+      "id": "bigmac",
+      "name": "巨无霸",
+      "category": "main",
+      "price": 2450,
+      "desc": "双层牛肉饼、生菜、芝士、酸黄瓜、洋葱、巨无霸酱",
+      "allergens": [
+        "gluten",
+        "milk",
+        "egg",
+        "soy",
+        "sesame"
+      ],
+      "meat": "beef",
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 513,
+      "sodium": 961,
+      "protein": 27.0
+    },
+    {
+      "id": "mccrispy",
+      "name": "麦辣鸡腿堡",
+      "category": "main",
+      "price": 2250,
+      "desc": "香辣鸡腿、生菜、沙拉酱",
+      "allergens": [
+        "gluten",
+        "egg",
+        "soy"
+      ],
+      "meat": "chicken",
+      "spicy": 3,
+      "fried": true,
+      "caffeine": false,
+      "kcal": 485,
+      "sodium": 1208,
+      "protein": 24.0
+    },
+    {
+      "id": "grilled-chicken-burger",
+      "name": "板烧鸡腿堡",
+      "category": "main",
+      "price": 2350,
+      "desc": "黑椒风味烤鸡腿、生菜、沙拉酱",
+      "allergens": [
+        "gluten",
+        "egg",
+        "soy"
+      ],
+      "meat": "chicken",
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 391,
+      "sodium": 1041,
+      "protein": 23.0
+    },
+    {
+      "id": "double-cheese",
+      "name": "双层吉士汉堡",
+      "category": "main",
+      "price": 1950,
+      "desc": "双层牛肉饼、芝士、酸黄瓜、番茄酱",
+      "allergens": [
+        "gluten",
+        "milk",
+        "soy",
+        "sesame"
+      ],
+      "meat": "beef",
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 429,
+      "sodium": 1017,
+      "protein": 27.0
+    },
+    {
+      "id": "filet-o-fish",
+      "name": "麦香鱼",
+      "category": "main",
+      "price": 1850,
+      "desc": "鳕鱼排、芝士、塔塔酱",
+      "allergens": [
+        "gluten",
+        "fish",
+        "milk",
+        "egg"
+      ],
+      "meat": "fish",
+      "spicy": 0,
+      "fried": true,
+      "caffeine": false,
+      "kcal": 325,
+      "sodium": 556,
+      "protein": 16.0
+    },
+    {
+      "id": "mcchicken",
+      "name": "麦香鸡",
+      "category": "main",
+      "price": 1650,
+      "desc": "鸡肉饼、生菜、沙拉酱",
+      "allergens": [
+        "gluten",
+        "egg",
+        "soy"
+      ],
+      "meat": "chicken",
+      "spicy": 0,
+      "fried": true,
+      "caffeine": false,
+      "kcal": 369,
+      "sodium": 731,
+      "protein": 15.0
+    },
+    {
+      "id": "cheeseburger",
+      "name": "吉士汉堡",
+      "category": "main",
+      "price": 1350,
+      "desc": "牛肉饼、芝士、番茄酱、酸黄瓜",
+      "allergens": [
+        "gluten",
+        "milk",
+        "soy"
+      ],
+      "meat": "beef",
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 300
+    },
+    {
+      "id": "mcnuggets-5",
+      "name": "麦乐鸡（5块）",
+      "category": "main",
+      "price": 1450,
+      "desc": "鸡胸肉裹粉油炸",
+      "allergens": [
+        "gluten",
+        "egg",
+        "soy"
+      ],
+      "meat": "chicken",
+      "spicy": 0,
+      "fried": true,
+      "caffeine": false,
+      "kcal": 230
+    },
+    {
+      "id": "big-chicken-steak",
+      "name": "那么大鸡排",
+      "category": "main",
+      "price": 1650,
+      "desc": "整块鸡胸肉裹粉油炸、椒盐",
+      "allergens": [
+        "gluten",
+        "egg"
+      ],
+      "meat": "chicken",
+      "spicy": 0,
+      "fried": true,
+      "caffeine": false,
+      "kcal": 380
+    },
+    {
+      "id": "spicy-wings-2",
+      "name": "麦辣鸡翅（2块）",
+      "category": "main",
+      "price": 1450,
+      "desc": "香辣腌制鸡翅、裹粉油炸",
+      "allergens": null,
+      "meat": "chicken",
+      "spicy": 3,
+      "fried": true,
+      "caffeine": false,
+      "kcal": 340
+    },
+    {
+      "id": "corn-cup",
+      "name": "玉米杯",
+      "category": "side",
+      "price": 950,
+      "desc": "甜玉米粒、黄油",
+      "allergens": null,
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 130
+    },
+    {
+      "id": "fries-m",
+      "name": "薯条（中）",
+      "category": "side",
+      "price": 1050,
+      "desc": "马铃薯条、油炸、撒盐",
+      "allergens": null,
+      "meat": null,
+      "spicy": 0,
+      "fried": true,
+      "caffeine": false,
+      "kcal": 340
+    },
+    {
+      "id": "apple-slices",
+      "name": "苹果片",
+      "category": "side",
+      "price": 850,
+      "desc": "鲜切苹果",
+      "allergens": [],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 32,
+      "sodium": 0,
+      "protein": 0.0
+    },
+    {
+      "id": "onion-rings",
+      "name": "洋葱圈",
+      "category": "side",
+      "price": 1150,
+      "desc": "洋葱裹粉油炸",
+      "allergens": null,
+      "meat": null,
+      "spicy": 0,
+      "fried": true,
+      "caffeine": false,
+      "kcal": 280
+    },
+    {
+      "id": "coke-m",
+      "name": "可口可乐（中）",
+      "category": "drink",
+      "price": 1050,
+      "desc": "含咖啡因碳酸饮料",
+      "allergens": [],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": true,
+      "kcal": 150
+    },
+    {
+      "id": "coke-zero-m",
+      "name": "零度可乐（中）",
+      "category": "drink",
+      "price": 1050,
+      "desc": "无糖碳酸饮料，含咖啡因",
+      "allergens": [],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": true,
+      "kcal": 0
+    },
+    {
+      "id": "sprite-m",
+      "name": "雪碧（中）",
+      "category": "drink",
+      "price": 1050,
+      "desc": "柠檬味碳酸饮料",
+      "allergens": [],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 140
+    },
+    {
+      "id": "soy-milk",
+      "name": "豆浆",
+      "category": "drink",
+      "price": 950,
+      "desc": "大豆饮品",
+      "allergens": [
+        "soy"
+      ],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 120
+    },
+    {
+      "id": "milk-cup",
+      "name": "纯牛奶",
+      "category": "drink",
+      "price": 850,
+      "desc": "牛奶",
+      "allergens": [
+        "milk"
+      ],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 130
+    },
+    {
+      "id": "latte",
+      "name": "拿铁",
+      "category": "drink",
+      "price": 1850,
+      "desc": "浓缩咖啡、牛奶",
+      "allergens": [
+        "milk"
+      ],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": true,
+      "kcal": 180
+    },
+    {
+      "id": "americano",
+      "name": "美式咖啡",
+      "category": "drink",
+      "price": 1450,
+      "desc": "浓缩咖啡、水",
+      "allergens": [],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": true,
+      "kcal": 10
+    },
+    {
+      "id": "orange-juice",
+      "name": "橙汁",
+      "category": "drink",
+      "price": 1250,
+      "desc": "橙汁饮料",
+      "allergens": [],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 110
+    },
+    {
+      "id": "mcflurry-oreo",
+      "name": "麦旋风（奥利奥）",
+      "category": "dessert",
+      "price": 1650,
+      "desc": "冰淇淋、饼干碎",
+      "allergens": [
+        "milk",
+        "gluten"
+      ],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 350
+    },
+    {
+      "id": "sundae-strawberry",
+      "name": "圣代（草莓）",
+      "category": "dessert",
+      "price": 1050,
+      "desc": "冰淇淋、草莓酱",
+      "allergens": [
+        "milk"
+      ],
+      "meat": null,
+      "spicy": 0,
+      "fried": false,
+      "caffeine": false,
+      "kcal": 230
+    },
+    {
+      "id": "taro-pie",
+      "name": "香芋派",
+      "category": "dessert",
+      "price": 1050,
+      "desc": "派皮、香芋馅",
+      "allergens": [
+        "gluten",
+        "milk"
+      ],
+      "meat": null,
+      "spicy": 0,
+      "fried": true,
+      "caffeine": false,
+      "kcal": 232,
+      "sodium": 159,
+      "protein": 2.0
+    }
+  ],
+  "coupons": [
+    {
+      "id": "c40-8",
+      "name": "满40减8",
+      "threshold": 4000,
+      "discount": 800
+    },
+    {
+      "id": "c60-15",
+      "name": "满60减15",
+      "threshold": 6000,
+      "discount": 1500
+    },
+    {
+      "id": "c30-5",
+      "name": "满30减5",
+      "threshold": 3000,
+      "discount": 500
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# 本地生成的产物
+card.html
+*.local.html
+out/
+.env
+.env.*
+
+.DS_Store
+Thumbs.db
+out.json
+*.local.md
