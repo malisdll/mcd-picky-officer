@@ -1,0 +1,16 @@
+# 统一按 LF 存储，避免 Windows 上提交 CRLF、CI（Linux）上再变回去，
+# 导致每次 diff 都出现整文件改动。
+* text=auto eol=lf
+
+# 这些是二进制，别让它尝试做换行转换
+*.png binary
+*.jpg binary
+*.ico binary
+
+# GitHub 会把 .md 当 Markdown 渲染、.py 当 Python 识别，
+# 明确一下免得被 text=auto 猜错。
+*.md   text eol=lf
+*.py   text eol=lf
+*.json text eol=lf
+*.yml  text eol=lf
+*.html text eol=lf
