@@ -45,6 +45,10 @@ jobs:
           echo "自检通过：$(wc -c < demo/index.html) 字节，无外部依赖"
 
       - uses: actions/configure-pages@v5
+        with:
+          # 首次部署时自动开启 Pages（Source = GitHub Actions），
+          # 省掉「先去 Settings 点一下」这一步。已开启时该参数无副作用。
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
