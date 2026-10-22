@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>麦麦挑食官 · 我能吃什么</title>
+<meta name="description" content="选好你的忌口，看看麦当劳菜单里哪些你能吃、哪些必须问柜台。">
+<style>
+  :root{
+    --ink:#15171c; --ink2:#3d434d; --ink3:#6b7280;
+    --line:#e6e1d9; --bg:#fbf9f6; --card:#fff;
+    --hit:#b42318; --hitbg:#fef3f2;
+    --risk:#b45309; --riskbg:#fdf3e7;
+    --info:#5b6472; --infobg:#f3f4f6;
+    --clear:#1e7a4f; --clearbg:#f1faf5;
+    --accent:#8a4b12; --accentbg:#fdf3e7;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);line-height:1.6;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:24px 18px 80px}
+  header{border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:20px}
+  .reality{font-size:12.5px;line-height:1.75;color:var(--ink2);background:#fff;
+    border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;
+    padding:12px 15px;margin:-4px 0 22px}
+  .reality b{color:var(--ink)}
+  .askbox{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:10px;padding:14px 16px;margin:16px 0}
+  .askbox .lead{font-size:12px;color:var(--ink3);margin:0 0 10px}
+  .askbox ol{margin:0;padding-left:20px;font-size:13.5px}
+  .askbox ol li{margin:6px 0}
+  .askbox .who{display:block;font-size:11.5px;color:var(--ink3);margin-top:2px}
+  .brand{font-size:11px;letter-spacing:.18em;color:var(--accent);font-weight:800;margin-bottom:6px}
+  h1{font-size:25px;margin:0 0 6px;letter-spacing:-.02em;line-height:1.25}
+  .tagline{font-size:13.5px;color:var(--ink3);margin:0}
+  .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;
+    background:var(--accentbg);color:var(--accent);border:1px solid #eddcc6;margin-left:6px;vertical-align:middle;font-weight:600}
+
+  .grid{display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start}
+  @media(max-width:760px){.grid{grid-template-columns:1fr;gap:14px}}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 18px}
+  .panel.sticky{position:sticky;top:16px}
+  @media(max-width:760px){.panel.sticky{position:static}}
+  h2{font-size:13px;margin:0 0 10px;color:var(--ink2);font-weight:700;
+     display:flex;justify-content:space-between;align-items:baseline}
+  h2 small{font-weight:400;color:var(--ink3);font-size:11.5px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+  .chip{font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+    background:#fff;color:var(--ink2);cursor:pointer;transition:.12s;user-select:none;line-height:1.3}
+  .chip:hover{border-color:#cfc6b8}
+  .chip[aria-pressed="true"]{background:var(--hitbg);border-color:#f0b8b3;color:var(--hit);font-weight:600}
+  .chip.diet[aria-pressed="true"]{background:var(--clearbg);border-color:#c6e5d4;color:var(--clear)}
+
+  .budget{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink2);margin-top:4px}
+  .budget input[type=range]{flex:1;accent-color:var(--accent)}
+  .budget b{font-variant-numeric:tabular-nums;min-width:52px;text-align:right;font-size:15px}
+
+  .preset{font-size:12px;color:var(--accent);background:none;border:none;padding:0;
+    cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:inherit}
+  .row{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+
+  .say{font-size:12.5px;color:var(--ink3);background:var(--bg);border:1px dashed var(--line);
+    border-radius:8px;padding:10px 12px;margin-bottom:16px;line-height:1.7}
+  .say b{color:var(--ink2);font-weight:600}
+
+  .summary{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;margin-bottom:16px}
+  .summary .big{font-size:17px;font-weight:750;margin-bottom:4px}
+  .summary p{margin:0;font-size:13px;color:var(--ink3)}
+  .stat{display:flex;gap:18px;margin-top:12px;flex-wrap:wrap}
+  .stat div{font-size:12px;color:var(--ink3)}
+  .stat b{display:block;font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.2}
+  .stat .c{color:var(--clear)} .stat .h{color:var(--hit)} .stat .o{color:var(--risk)} .stat .n{color:var(--info)}
+
+  .plan{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:10px;padding:13px 15px;margin-bottom:10px}
+  .plan-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .plan-h .t{font-weight:700;font-size:14px}
+  .plan-h .p{font-size:17px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+  .plan ul{margin:8px 0 0;padding-left:17px;font-size:13px;color:var(--ink2)}
+  .plan ul li{margin:2px 0}
+  .plan .note{font-size:11.5px;color:var(--ink3);margin-top:8px;padding-top:7px;
+    border-top:1px dashed var(--line);line-height:1.6}
+
+  .sect{font-size:13px;font-weight:700;color:var(--ink2);margin:22px 0 8px;
+    display:flex;justify-content:space-between;align-items:baseline}
+  .sect span{font-size:11.5px;font-weight:400;color:var(--ink3)}
+  .list{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .it{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid #f2efe9}
+  .it:last-child{border-bottom:none}
+  .it .nm{flex:1;min-width:0}
+  .it .nm b{font-weight:600;font-size:14px}
+  .it .nm em{display:block;font-style:normal;font-size:11.5px;color:var(--ink3);margin-top:2px;line-height:1.5}
+  .it .pr{font-size:13.5px;font-variant-numeric:tabular-nums;color:var(--ink2);white-space:nowrap;padding-top:1px}
+  .v{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:4px;white-space:nowrap;margin-top:2px}
+  .v-hit{background:var(--hitbg);color:var(--hit)}
+  .v-risk{background:var(--riskbg);color:var(--risk)}
+  .v-info{background:var(--infobg);color:var(--info)}
+  .v-clear{background:var(--clearbg);color:var(--clear)}
+  .empty{font-size:13px;color:var(--ink3);padding:14px}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:11.5px;color:var(--ink2);
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:18px 0}
+  .legend i{font-style:normal;display:inline-flex;align-items:center;gap:5px}
+
+  footer{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:11.5px;color:var(--ink3);line-height:1.8}
+  footer b{color:var(--ink2)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">麦麦挑食官 · PICKY OFFICER</div>
+  <h1>我能吃什么<span class="badge">示例数据</span></h1>
+  <p class="tagline">勾出你的忌口，直接看菜单里哪些你能吃、哪些得先问柜台。不用登录，不上传任何信息。</p>
+</header>
+
+<div class="reality">
+  <b>先说清楚一件事。</b>接真实数据后我们才发现：麦当劳官方 MCP 的 35 个工具里，
+  <b>没有一个返回配料或过敏原字段</b>。所以在真实菜单上，绝大多数餐品只能是「信息不足」——
+  对花生过敏的人来说，99 个在售餐品里没有一个能被官方数据确认可吃。
+  <br>
+  这个页面的示例数据<b>人工补了配料字段</b>，用来看引擎在「有完整数据」时的样子。
+  真实形态是把这些查不到的餐品编成几句能念给柜台的话，见下面的问询清单。
+</div>
+
+<div class="grid">
+
+  <div class="panel sticky">
+    <h2>过敏原 <small>命中即排除</small></h2>
+    <div class="chips" id="allergenChips"></div>
+
+    <h2>不吃这些 <small>口味/食材</small></h2>
+    <div class="chips" id="avoidChips"></div>
+
+    <h2>饮食类型 <small>可选</small></h2>
+    <div class="chips" id="dietChips"></div>
+
+    <div class="row">
+      <span style="font-size:13px;color:var(--ink2);font-weight:700">人均预算</span>
+      <button class="preset" id="clearBtn">清空</button>
+    </div>
+    <div class="budget">
+      <input type="range" id="budget" min="10" max="60" step="1" value="25">
+      <b id="budgetVal">25 元</b>
+    </div>
+    <p style="font-size:11.5px;color:var(--ink3);margin:8px 0 0">拖到 60 表示不限预算</p>
+  </div>
+
+  <div>
+    <div class="chips" id="presetBar" style="margin-bottom:16px"></div>
+    <div class="say" id="say"></div>
+
+    <div class="summary">
+      <div class="big" id="headline">先勾一个忌口试试</div>
+      <p id="subline">或者直接点下面的场景，一秒看到结果。</p>
+      <div class="stat" id="stat"></div>
+    </div>
+
+    <div id="plans"></div>
+
+    <div class="legend">
+      <i><span class="v v-clear">未见疑点</span> 官方标注里没列出</i>
+      <i><span class="v v-info">信息不足</span> 官方查不到对应数据</i>
+      <i><span class="v v-risk">可能含有</span> 建议问柜台</i>
+      <i><span class="v v-hit">含</span> 已排除</i>
+    </div>
+
+    <div id="lists"></div>
+
+    <div id="ask"></div>
+  </div>
+</div>
+
+<footer>
+  <b>这不是医疗或营养建议。</b>本页只做配料数据的规则匹配，无法覆盖门店现场的交叉接触（同一油炸锅、同一操作台、共用器具）。<b>严重过敏请务必在门店当面确认，并以门店答复为准。</b><br>
+  本页为静态演示，使用<b>示例数据</b>，价格为模拟值，不连接任何线上服务。真实版本通过麦当劳 MCP 拉取实时菜单、营养与算价——
+  但官方 MCP 目前<b>不提供配料与过敏原字段</b>，所以真实形态下「信息不足」会远多于本页示例。<br>
+  麦当劳程序员创意开发大赛参赛作品，由参赛者独立开发，非麦当劳官方产品。
+</footer>
+
+</div>
+
+<script>
+/* ---------- 数据（与 data/sample_menu.json 同步的示例数据） ---------- */
+const ALLERGENS = [
+  {id:"peanut", label:"花生", hit:["花生","花生酱","花生碎","花生油"], risk:["坚果","果仁"], ask:"配料里有花生、花生油或花生酱吗"},
+  {id:"treenut", label:"坚果", hit:["坚果","核桃","杏仁","腰果","榛子","开心果"], risk:["果仁"], ask:"配料或表面有坚果碎、坚果酱吗"},
+  {id:"milk", label:"奶/乳制品", hit:["牛奶","芝士","奶酪","黄油","奶油","奶昔","拿铁","冰淇淋","圣代","麦旋风","乳"], risk:["蛋糕","派","酱"], ask:"里面用了牛奶、黄油、芝士或奶油吗"},
+  {id:"egg", label:"蛋", hit:["鸡蛋","蛋黄","蛋白","沙拉酱","蛋黄酱"], risk:["酱","裹粉","炸"], ask:"配料里有鸡蛋或蛋黄酱吗"},
+  {id:"gluten", label:"麸质", hit:["小麦","面包","汉堡胚","面粉","麸质","面糊","裹粉","派皮"], risk:["堡","麦香","薯条","油炸"], ask:"面包是小麦粉做的吗？炸粉用的也是面粉吗"},
+  {id:"soy", label:"大豆", hit:["大豆","豆浆","豆腐","酱油"], risk:["酱汁","调味"], ask:"配料或酱料里有大豆、豆浆或酱油吗"},
+  {id:"fish", label:"鱼", hit:["鱼","鳕鱼","鱼排"], risk:["海鲜"], ask:"配料或酱料里有鱼、鱼露或鳀鱼成分吗"},
+  {id:"shellfish", label:"甲壳类", hit:["虾","蟹","贝","龙虾"], risk:["海鲜","高汤"], ask:"配料或酱料里有虾、蟹或蚝油吗"},
+  {id:"sesame", label:"芝麻", hit:["芝麻","芝麻酱"], risk:["汉堡胚","面包"], ask:"面包上或酱料里有芝麻吗"}
+];
+const AVOID = [
+  {id:"spicy", label:"辣", hit:["辣","辣椒","香辣","麻辣","藤椒"], ask:"做的时候放了辣椒、辣酱或辣味粉吗"},
+  {id:"fried", label:"油炸", hit:["炸","鸡排","鸡翅","薯条","鸡块","麦乐鸡"], ask:"这份是油炸的还是烤的"},
+  {id:"beef", label:"牛肉", hit:["牛肉","牛"], ask:"这份的主料是牛肉吗"},
+  {id:"pork", label:"猪肉", hit:["猪肉","培根","火腿"], ask:"这份含猪肉、培根或火腿吗"},
+  {id:"caffeine", label:"咖啡因", hit:["咖啡","拿铁","美式","可乐"], ask:"这个含咖啡因吗（咖啡、茶或可乐底）"}
+];
+const DIETS = [
+  {id:"vegetarian", label:"素食", meat:["chicken","beef","pork","fish","lamb"], ask:"这份里没有任何禽肉、畜肉或鱼肉吗"},
+  {id:"vegan", label:"纯素", meat:["chicken","beef","pork","fish","lamb"], allergens:["milk","egg"], ask:"这份里没有奶、蛋、蜂蜜等任何动物来源成分吗"},
+  {id:"halal", label:"清真", meat:["pork"], ask:"这份不含猪肉、培根或猪油吗"}
+];
+const ITEMS = [
+  {id:"bigmac",n:"巨无霸",c:"main",p:2450,d:"双层牛肉饼、生菜、芝士、酸黄瓜、洋葱、巨无霸酱",a:["gluten","milk","egg","soy","sesame"],m:"beef",s:0,f:false,cf:false,k:590},
+  {id:"mccrispy",n:"麦辣鸡腿堡",c:"main",p:2250,d:"香辣鸡腿、生菜、沙拉酱",a:["gluten","egg","soy"],m:"chicken",s:3,f:true,cf:false,k:570},
+  {id:"grilled",n:"板烧鸡腿堡",c:"main",p:2350,d:"黑椒风味烤鸡腿、生菜、沙拉酱",a:["gluten","egg","soy"],m:"chicken",s:0,f:false,cf:false,k:470},
+  {id:"dblcheese",n:"双层吉士汉堡",c:"main",p:1950,d:"双层牛肉饼、芝士、酸黄瓜、番茄酱",a:["gluten","milk","soy","sesame"],m:"beef",s:0,f:false,cf:false,k:450},
+  {id:"fish",n:"麦香鱼",c:"main",p:1850,d:"鳕鱼排、芝士、塔塔酱",a:["gluten","fish","milk","egg"],m:"fish",s:0,f:true,cf:false,k:330},
+  {id:"mcchicken",n:"麦香鸡",c:"main",p:1650,d:"鸡肉饼、生菜、沙拉酱",a:["gluten","egg","soy"],m:"chicken",s:0,f:true,cf:false,k:400},
+  {id:"cheese",n:"吉士汉堡",c:"main",p:1350,d:"牛肉饼、芝士、番茄酱、酸黄瓜",a:["gluten","milk","soy"],m:"beef",s:0,f:false,cf:false,k:300},
+  {id:"nuggets",n:"麦乐鸡（5块）",c:"main",p:1450,d:"鸡胸肉裹粉油炸",a:["gluten","egg","soy"],m:"chicken",s:0,f:true,cf:false,k:230},
+  {id:"steak",n:"那么大鸡排",c:"main",p:1650,d:"整块鸡胸肉裹粉油炸、椒盐",a:["gluten","egg"],m:"chicken",s:0,f:true,cf:false,k:380},
+  {id:"wings",n:"麦辣鸡翅（2块）",c:"main",p:1450,d:"香辣腌制鸡翅、裹粉油炸",a:null,m:"chicken",s:3,f:true,cf:false,k:340},
+  {id:"corn",n:"玉米杯",c:"side",p:950,d:"甜玉米粒、黄油",a:null,m:null,s:0,f:false,cf:false,k:130},
+  {id:"fries",n:"薯条（中）",c:"side",p:1050,d:"马铃薯条、油炸、撒盐",a:null,m:null,s:0,f:true,cf:false,k:340},
+  {id:"apple",n:"苹果片",c:"side",p:850,d:"鲜切苹果",a:[],m:null,s:0,f:false,cf:false,k:35},
+  {id:"onion",n:"洋葱圈",c:"side",p:1150,d:"洋葱裹粉油炸",a:null,m:null,s:0,f:true,cf:false,k:280},
+  {id:"coke",n:"可口可乐（中）",c:"drink",p:1050,d:"含咖啡因碳酸饮料",a:[],m:null,s:0,f:false,cf:true,k:150},
+  {id:"cokezero",n:"零度可乐（中）",c:"drink",p:1050,d:"无糖碳酸饮料，含咖啡因",a:[],m:null,s:0,f:false,cf:true,k:0},
+  {id:"sprite",n:"雪碧（中）",c:"drink",p:1050,d:"柠檬味碳酸饮料",a:[],m:null,s:0,f:false,cf:false,k:140},
+  {id:"soymilk",n:"豆浆",c:"drink",p:950,d:"大豆饮品",a:["soy"],m:null,s:0,f:false,cf:false,k:120},
+  {id:"milk",n:"纯牛奶",c:"drink",p:850,d:"牛奶",a:["milk"],m:null,s:0,f:false,cf:false,k:130},
+  {id:"latte",n:"拿铁",c:"drink",p:1850,d:"浓缩咖啡、牛奶",a:["milk"],m:null,s:0,f:false,cf:true,k:180},
+  {id:"americano",n:"美式咖啡",c:"drink",p:1450,d:"浓缩咖啡、水",a:[],m:null,s:0,f:false,cf:true,k:10},
+  {id:"oj",n:"橙汁",c:"drink",p:1250,d:"橙汁饮料",a:[],m:null,s:0,f:false,cf:false,k:110},
+  {id:"mcflurry",n:"麦旋风（奥利奥）",c:"dessert",p:1650,d:"冰淇淋、饼干碎",a:["milk","gluten"],m:null,s:0,f:false,cf:false,k:350},
+  {id:"sundae",n:"圣代（草莓）",c:"dessert",p:1050,d:"冰淇淋、草莓酱",a:["milk"],m:null,s:0,f:false,cf:false,k:230},
+  {id:"pie",n:"香芋派",c:"dessert",p:1050,d:"派皮、香芋馅",a:["gluten","milk"],m:null,s:0,f:true,cf:false,k:250}
+];
+const COUPONS = [
+  {id:"c30",n:"满30减5",t:3000,d:500},
+  {id:"c40",n:"满40减8",t:4000,d:800},
+  {id:"c60",n:"满60减15",t:6000,d:1500}
+];
+
+/* ---------- 工具 ---------- */
+const yuan = f => (f/100).toFixed(2);
+const state = {allergens:new Set(), avoid:new Set(), diets:new Set(), budget:2500};
+
+/* ---------- 判定（与 Python 版同构） ---------- */
+const V = {CLEAR:0, INFO:1, RISK:2, HIT:3};
+const VLABEL = {0:"未见疑点",1:"信息不足",2:"可能含有",3:"含"};
+const VCLS = {0:"v-clear",1:"v-info",2:"v-risk",3:"v-hit"};
+
+function firstKw(text, kws){ for(const k of kws){ if(text.includes(k)) return k; } return null; }
+
+function assess(item){
+  let verdict = V.CLEAR; let reasons = [];
+  const text = item.n + " " + item.d;
+  const bump = (v, r) => {
+    if(v > verdict){ verdict = v; reasons = r ? [r] : []; }
+    else if(v === verdict && r && !reasons.includes(r)){ reasons.push(r); }
+  };
+
+  for(const id of state.allergens){
+    const e = ALLERGENS.find(x=>x.id===id);
+    if(item.a !== null && item.a.includes(id)){ bump(V.HIT, `官方配料标注含「${e.label}」`); continue; }
+    const hk = firstKw(text, e.hit);
+    if(hk){ bump(V.HIT, `名称/描述出现「${hk}」，与${e.label}相关`); continue; }
+    const rk = firstKw(text, e.risk);
+    if(rk){ bump(V.RISK, `描述出现「${rk}」，可能涉及${e.label}`); continue; }
+    if(item.a === null){ bump(V.INFO, `官方未提供配料信息，无法确认是否含${e.label}`); }
+  }
+
+  for(const id of state.avoid){
+    const e = AVOID.find(x=>x.id===id);
+    if(id === "spicy"){ if(item.s >= 2) bump(V.HIT, `辣度标记为 ${item.s}/3`); else if(item.s === 1) bump(V.RISK,"轻微辣度，建议确认"); continue; }
+    if(id === "fried" && item.f){ bump(V.HIT, "制作方式为油炸"); continue; }
+    if(id === "caffeine" && item.cf){ bump(V.HIT, "含咖啡因"); continue; }
+    if(id === item.m){ bump(V.HIT, `主料为${e.label}`); continue; }
+    const hk = firstKw(text, e.hit);
+    if(hk){ bump(V.HIT, `名称/描述出现「${hk}」`); }
+  }
+
+  for(const id of state.diets){
+    const e = DIETS.find(x=>x.id===id);
+    if(item.m && e.meat.includes(item.m)) bump(V.HIT, `${e.label}：主料为「${item.m}」`);
+    if(e.allergens){
+      for(const fa of e.allergens){
+        if(item.a !== null && item.a.includes(fa)) bump(V.HIT, `${e.label}：含「${(ALLERGENS.find(x=>x.id===fa)||{}).label||fa}」`);
+        else if(item.a === null) bump(V.INFO, `${e.label}：官方未提供配料信息`);
+      }
+    }
+  }
+  if(verdict === V.CLEAR && !reasons.length) reasons.push("官方配料标注中未列出");
+  return {item, verdict, reasons};
+}
+
+/* ---------- 方案 ---------- */
+function buildPlans(rows, budget){
+  const pool = rows.filter(r => r.verdict === V.CLEAR).map(r=>r.item);
+  const mains = pool.filter(i=>i.c==="main");
+  const drinks = pool.filter(i=>i.c==="drink").sort((a,b)=>a.p-b.p);
+  const sides = pool.filter(i=>i.c==="side").sort((a,b)=>a.p-b.p);
+  const desserts = pool.filter(i=>i.c==="dessert").sort((a,b)=>a.p-b.p);
+  if(!mains.length) return [{label:"没有可选主食", items:[], notes:["在当前条件下没有能确定放行的主食。","这可能是配料确实冲突，也可能是官方没给数据——去看「信息不足」那一栏。"]}];
+
+  const drinkOpts = drinks.length ? drinks : [null];      // 「最省一单」要求一份完整餐
+  const anyDrinks = [null, ...drinks];                    // 「吃得饱」允许单点
+  const pairs = [];
+  for(const m of mains) for(const d of drinkOpts) pairs.push([m,d].filter(Boolean));
+  pairs.sort((x,y)=>sum(x)-sum(y));
+
+  const out = [];
+  const seen = new Set();
+  const push = p => { const k = p.items.map(i=>i.id).sort().join(",")||p.label; if(!seen.has(k)){ seen.add(k); out.push(p);} };
+
+  const cheapest = pairs[0];
+  const cheapestCost = sum(cheapest);
+  const couponFor = sub => {
+    const ok = COUPONS.filter(c=>sub>=c.t).sort((a,b)=>b.d-a.d)[0];
+    return ok ? {c:ok, d:ok.d} : null;
+  };
+  const mk = (label, items, extra=[]) => {
+    const sub = sum(items);
+    const cp = couponFor(sub);
+    const notes = [...extra];
+    if(cp) notes.push(`已命中「${cp.c.n}」，省 ${yuan(cp.d)} 元`);
+    else {
+      const near = COUPONS.filter(c=>sub<c.t).sort((a,b)=>(a.t-sub)-(b.t-sub))[0];
+      if(near) notes.push(`再点 ${yuan(near.t-sub)} 元可触发「${near.n}」`);
+    }
+    return {label, items, subtotal:sub, total:sub-(cp?cp.d:0), notes};
+  };
+
+  if(budget === null || cheapestCost <= budget) push(mk("最省一单", cheapest));
+
+  const sideOpts = [null, ...sides];
+  let feasible = [];
+  for(const m of mains) for(const d of anyDrinks) {
+    const base = (d ? [m,d] : [m]);
+    for(const s of sideOpts){
+      const combo = s ? base.concat([s]) : base;
+      if(budget === null || sum(combo) <= budget) feasible.push(combo);
+    }
+  }
+  if(!feasible.length){
+    push({label:"预算不够", items:[], subtotal:cheapestCost, total:cheapestCost,
+      notes:[`最便宜的可吃组合要 ${yuan(cheapestCost)} 元，超出预算 ${yuan(Math.max(0,cheapestCost-(budget||0)))} 元。`,
+             "没有硬凑一个超预算的方案——把超预算的东西塞给你，比说「不行」更糟。"]});
+    return out;
+  }
+  feasible.sort((a,b)=> (kcal(b)-kcal(a)) || (sum(a)-sum(b)));
+  const full = feasible[0];
+  const extra = budget===null ? [] : [`预算 ${yuan(budget)} 元，本方案 ${yuan(sum(full))} 元，剩余 ${yuan(budget-sum(full))} 元`];
+  push(mk("吃得饱", full, extra));
+  if(!full.some(i=>i.c==="drink") && drinks.length) out[out.length-1].notes.push("这份没配饮品：同样预算下它的总热量更高");
+
+  for(const d of desserts){
+    const cand = full.concat([d]);
+    if(budget === null || sum(cand) <= budget){ push(mk("加个甜的", cand, ["在「吃得饱」的基础上加了一份甜品"])); break; }
+  }
+
+  const noinfoCount = rows.filter(r=>r.verdict===V.INFO).length;
+  if(noinfoCount) for(const p of out) p.notes.push(`另有 ${noinfoCount} 个餐品因官方无配料信息未纳入方案`);
+
+  return out;
+}
+const sum = arr => arr.reduce((a,b)=>a+b.p,0);
+const kcal = arr => arr.reduce((a,b)=>a+b.k,0);
+
+/* ---------- 渲染 ---------- */
+function chipHTML(list, type){
+  return list.map(x=>`<button class="chip ${type==='diet'?'diet':''}" data-type="${type}" data-id="${x.id}"
+    aria-pressed="${state[type].has(x.id)}">${x.label}</button>`).join("");
+}
+
+function render(){
+  document.getElementById("allergenChips").innerHTML = chipHTML(ALLERGENS,"allergens");
+  document.getElementById("avoidChips").innerHTML = chipHTML(AVOID,"avoid");
+  document.getElementById("dietChips").innerHTML = chipHTML(DIETS,"diets");
+
+  const rows = ITEMS.map(assess).sort((a,b)=> b.verdict-a.verdict || a.item.p-b.item.p);
+  const hit = rows.filter(r=>r.verdict===V.HIT);
+  const risk = rows.filter(r=>r.verdict===V.RISK);
+  const info = rows.filter(r=>r.verdict===V.INFO);
+  const clear = rows.filter(r=>r.verdict===V.CLEAR);
+
+  const chosen = [...state.allergens].map(id=>ALLERGENS.find(x=>x.id===id).label)
+    .concat([...state.avoid].map(id=>"不吃"+AVOID.find(x=>x.id===id).label))
+    .concat([...state.diets].map(id=>DIETS.find(x=>x.id===id).label));
+
+  document.getElementById("say").innerHTML = chosen.length
+    ? `我理解成：<b>${chosen.join(" · ")}</b>${state.budget!==null?` · 人均 <b>${yuan(state.budget)} 元</b>`:""}`
+    : `还没选忌口。<b>下面的结果只是全菜单</b>，说明不了任何问题——先勾一个试试。`;
+
+  const plans = buildPlans(rows, state.budget);
+  document.getElementById("headline").textContent = chosen.length
+    ? `能确定点的 ${clear.length} 项，需要问柜台的 ${info.length + risk.length} 项`
+    : `全菜单 ${ITEMS.length} 项，等你告诉我忌口`;
+  document.getElementById("subline").textContent = chosen.length
+    ? (clear.length ? "下面只用了「官方标注里没列出」的餐品配方案。" : "没有可以确定放行的餐品，方案为空——这是诚实的答案。")
+    : "选完之后，会用官方标注数据做一次筛选。";
+
+  document.getElementById("stat").innerHTML = `
+    <div><b class="c">${clear.length}</b>未见疑点</div>
+    <div><b class="n">${info.length}</b>信息不足</div>
+    <div><b class="o">${risk.length}</b>可能含有</div>
+    <div><b class="h">${hit.length}</b>已排除</div>`;
+
+  document.getElementById("plans").innerHTML = plans.map(p=>{
+    const price = p.items.length
+      ? (p.subtotal !== p.total
+          ? `<span class="p"><s style="font-size:12px;color:#9ca3af;font-weight:400;margin-right:4px">${yuan(p.subtotal)}</s>${yuan(p.total)} 元</span>`
+          : `<span class="p">${yuan(p.total)} 元</span>`)
+      : "";
+    const ul = p.items.length ? `<ul>${p.items.map(i=>`<li>${i.n} — ${yuan(i.p)} 元</li>`).join("")}</ul>` : "";
+    const notes = p.notes.length ? `<div class="note">${p.notes.join("<br>")}</div>` : "";
+    return `<div class="plan"><div class="plan-h"><span class="t">${p.label}</span>${price}</div>${ul}${notes}</div>`;
+  }).join("");
+
+  const block = (title, sub, arr, hint) => {
+    if(!arr.length) return "";
+    const body = arr.map(r=>`<div class="it">
+        <div class="nm"><b>${r.item.n}</b>${r.verdict===V.CLEAR?"":`<em>${r.reasons[0]||""}</em>`}</div>
+        <div class="pr">${yuan(r.item.p)}</div>
+        <span class="v ${VCLS[r.verdict]}">${VLABEL[r.verdict]}</span>
+      </div>`).join("");
+    return `<div class="sect">${title}<span>${sub}</span></div>${hint?`<p style="font-size:11.5px;color:#6b7280;margin:-2px 0 8px">${hint}</p>`:""}<div class="list">${body}</div>`;
+  };
+
+  document.getElementById("lists").innerHTML =
+      block("可以直接点的", `${clear.length} 项`, clear)
+    + block("信息不足，得你自己问一句", `${info.length} 项`, info, "「信息不足」不等于安全。官方没给配料，我们就不替你猜。")
+    + block("可能含有，建议问柜台", `${risk.length} 项`, risk)
+    + block("已为你排除", `${hit.length} 项`, hit);
+
+  document.getElementById("ask").innerHTML = askHTML(info, risk);
+}
+
+/* 把「查不到」编译成能念给柜台的句子。真实数据下这一栏才是主力。 */
+function askHTML(info, risk){
+  const targets = info.concat(risk);
+  if(!targets.length) return "";
+
+  const qs = [];
+  if(state.allergens.size){
+    const labels = [...state.allergens].map(id=>ALLERGENS.find(x=>x.id===id).label);
+    qs.push([`和含${labels.join("、")}的餐品共用同一个炸锅或操作台吗`,
+             "先问这句——任何接口都查不到，但严重过敏最需要它"]);
+  }
+  [...state.allergens].forEach(id=>{ const e=ALLERGENS.find(x=>x.id===id); if(e&&e.ask) qs.push([e.ask+"？",""]); });
+  [...state.avoid].forEach(id=>{ const e=AVOID.find(x=>x.id===id); if(e&&e.ask) qs.push([e.ask+"？",""]); });
+  [...state.diets].forEach(id=>{ const e=DIETS.find(x=>x.id===id); if(e&&e.ask) qs.push([e.ask+"？",""]); });
+  if(!qs.length) return "";
+
+  const names = targets.slice(0,10).map(r=>r.item.n).join("、");
+  const more = targets.length>10 ? ` 等 ${targets.length} 项` : "";
+
+  return `<div class="askbox">
+    <p class="lead">官方查得到的数据有限。下面这几句可以直接念给店员，问完再决定点什么。</p>
+    <ol>${qs.map(([q,w])=>`<li>${q}${w?`<span class="who">${w}</span>`:""}</li>`).join("")}</ol>
+    <span class="who" style="margin-top:8px">适用于：${names}${more}</span>
+  </div>`;
+}
+
+/* ---------- 事件 ---------- */
+document.addEventListener("click", e=>{
+  const chip = e.target.closest(".chip");
+  if(chip && chip.dataset.type){
+    const {type, id} = chip.dataset;
+    if(state[type].has(id)) state[type].delete(id); else state[type].add(id);
+    render(); return;
+  }
+  const preset = e.target.closest("[data-preset]");
+  if(preset){ applyPreset(preset.dataset.preset); }
+});
+
+const budgetEl = document.getElementById("budget");
+budgetEl.addEventListener("input", ()=>{
+  const v = +budgetEl.value;
+  state.budget = v >= 60 ? null : v*100;
+  document.getElementById("budgetVal").textContent = v>=60 ? "不限" : v+" 元";
+  render();
+});
+document.getElementById("clearBtn").addEventListener("click", ()=>{
+  state.allergens.clear(); state.avoid.clear(); state.diets.clear(); render();
+});
+
+const PRESETS = {
+  peanut:{allergens:["peanut"], avoid:[], diets:[], budget:2500, label:"家长带娃：花生过敏"},
+  lactose:{allergens:["milk"], avoid:[], diets:[], budget:3000, label:"乳糖不耐"},
+  vegan:{allergens:[], avoid:[], diets:["vegan"], budget:4000, label:"纯素"},
+  office:{allergens:[], avoid:["spicy","fried"], diets:[], budget:2500, label:"打工人：不吃辣不吃油炸"}
+};
+function applyPreset(key){
+  const p = PRESETS[key]; if(!p) return;
+  state.allergens = new Set(p.allergens); state.avoid = new Set(p.avoid);
+  state.diets = new Set(p.diets); state.budget = p.budget;
+  budgetEl.value = p.budget/100;
+  document.getElementById("budgetVal").textContent = (p.budget/100)+" 元";
+  render();
+}
+
+/* 场景快捷入口 */
+document.getElementById("presetBar").innerHTML = Object.entries(PRESETS)
+  .map(([k,v])=>`<button class="chip" data-preset="${k}">${v.label}</button>`).join("");
+
+/* 支持分享链接直接落到某个场景，例如 ?p=peanut */
+const qp = new URLSearchParams(location.search).get("p");
+if(qp && PRESETS[qp]) applyPreset(qp); else render();
+</script>
+</body>
+</html>

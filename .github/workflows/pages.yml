@@ -1,0 +1,54 @@
+name: Deploy demo to GitHub Pages
+
+# 只发布 demo/ 这一个静态目录。理由：
+# 1. 它是唯一需要「在线试用」的东西，README 首屏的按钮就指向它；
+# 2. 单文件、零外部资源，不需要构建，出错面最小；
+# 3. 不发布仓库根目录，避免把 docs/mcp-tools.json 之类的原始数据一起摊开。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "demo/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 部署前自检（零外部资源）
+        run: |
+          set -e
+          test -s demo/index.html
+          # 演示页必须是自包含的：出现外链的 script/link 就说明有人在页面上挂了 CDN，
+          # 断网或 CDN 被墙时首屏就是白屏。
+          if grep -nE '<script[^>]+src=|<link[^>]+href="http' demo/index.html; then
+            echo "::error::demo/index.html 引用了外部资源，破坏了「断网可开」的承诺"
+            exit 1
+          fi
+          echo "自检通过：$(wc -c < demo/index.html) 字节，无外部依赖"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: demo
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
