@@ -33,12 +33,12 @@
 ```bash
 # 在 GitHub 网页上新建空仓库 mcd-picky-officer（不要勾 README/.gitignore/LICENSE）
 cd mcd-picky-officer
-git remote add origin https://github.com/<你的用户名>/mcd-picky-officer.git
+git remote add origin https://github.com/malisdll/mcd-picky-officer.git
 git branch -M main
 git push -u origin main
 ```
 
-如果本地还没初始化过，`python scripts/launch.py <你的用户名>` 会一次性做完：
+如果本地还没初始化过，`python scripts/launch.py malisdll` 会一次性做完：
 敏感信息扫描 → 替换占位符 → `git init` → 按模块分批提交 → 配置远程（**不推送**）。
 
 它刻意不做推送、不建远程仓库、不碰报名 Issue——这三件都需要你的 GitHub 凭证，脚本不该有能力代做。
@@ -52,7 +52,7 @@ git push -u origin main
 1. 仓库 → **Settings → Pages**
 2. **Source** 选 `GitHub Actions`（不是 "Deploy from a branch"）
 3. 回到 **Actions** 标签，等 `Deploy demo to GitHub Pages` 跑完
-4. 访问 `https://<你的用户名>.github.io/mcd-picky-officer/?p=peanut` 验证
+4. 访问 `https://malisdll.github.io/mcd-picky-officer/?p=peanut` 验证
 
 `pages.yml` 只发布 `demo/` 目录，并且会先自检「零外部资源」——如果哪天有人在演示页里挂了个 CDN，这个 workflow 会直接失败，而不是让首屏白屏。
 
@@ -60,7 +60,7 @@ git push -u origin main
 有了网址就可以在这一行上面加一个在线入口：
 
 ```markdown
-👉 [在线试用](https://<你的用户名>.github.io/mcd-picky-officer/?p=peanut)
+👉 [在线试用](https://malisdll.github.io/mcd-picky-officer/?p=peanut)
 ```
 
 别留一个指向不存在地址的按钮——点了 404 比没有链接更伤。
@@ -69,12 +69,12 @@ git push -u origin main
 
 ## 3. 提交参赛申请
 
-在活动仓库 `M-China/mcd-developer-innovation-challenge` 的 **Issues** 里，用指定模板新建，正文如下（把用户名和简介按需微调）：
+在活动仓库 `M-China/mcd-developer-innovation-challenge` 的 **Issues** 里，用指定模板新建，正文如下（已按 malisdll 填好，可直接复制）：
 
 ```text
 【参赛申请】
 项目名称：麦麦挑食官 mcd-picky-officer
-项目地址：https://github.com/<你的用户名>/mcd-picky-officer
+项目地址：https://github.com/malisdll/mcd-picky-officer
 项目简介：麦当劳官方 MCP 有 35 个工具，但没有一个返回配料或过敏原——我用真实接口验证了这件事，并把它做成了产品：对花生过敏的人，99 个在售餐品里 0 个能被官方数据确认可吃。所以这个工具不假装知道，它用官方营养表做精确的控钠/控热量筛选，再把查不到的那部分编译成几句能直接念给柜台的问句（交叉接触问题排第一）。规则引擎判定，零第三方依赖，206 个离线测试，附真实 MCP 体检快照。
 ```
 
